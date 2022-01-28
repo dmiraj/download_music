@@ -1,13 +1,15 @@
-# In this script I will be choosing which dowload-item to add/download/update.
-youtube_dl_bin="$PWD/yt-dl-fork/youtube-dl"
-youtube_dl_config="$PWD/youtube-dl/youtube-dl.config"
-download_types=( "Playlist" "Album" "Likes" "q - to quit")
+# in this script i will be choosing which dowload-item to add/download/update.
+youtube_dl_bin="$HOME/download_music/yt-dl-fork/youtube-dl"
+youtube_dl_config="$HOME/download_music/yt-dl-fork/youtube-dl.config"
+download_types=( "Playlist" "Album" "Likes" "Quit?")
+
+set -x
 
 # The following function contains the script to write in a file in each of the newly downloaded objects
 function write_script () {
 	cat > "$dirname"/script.sh <<delimiter
-youtube_dl_bin="/home/dmiraj/Documents/Bash/yt-dl-fork/youtube-dl"
-youtube_dl_config="/home/dmiraj/Documents/Bash/yt-dl-fork/youtube-dl.config"
+youtube_dl_bin="$HOME/download_music/yt-dl-fork/youtube-dl"
+youtube_dl_config="$HOME/download_music/yt-dl-fork/youtube-dl.config"
 
 # Run the 'youtube-dl' script.
 cd "$dirname"
@@ -54,21 +56,23 @@ select download_type in "${download_types[@]}"; do
 		read -p "Enter link to your liked song: " link
 		# It will be a bit different for this one here.
 		# Also don't forget to set up a log file in here.
+		export logfile=log
 		if ! [ -a "My Likes" ]; then
 			export dirname="$PWD/My Likes"
 			mkdir "$dirname"
 			cd "$dirname"
-			bash "$youtube_dl_bin" --config-location "$youtube_dl_config" "$link" &
+			python "$youtube_dl_bin" --config-location "$youtube_dl_config" "$link" &> "$logfile" &
 		else
 			cd "$PWD/My Likes"
-			bash "$youtube_dl_bin" --config-location "$youtube_dl_config" "$link" &
+			python "$youtube_dl_bin" --config-location "$youtube_dl_config" "$link" &> "$logfile" &
 		fi
+		cd ../ # Return to Parent direcotry '$HOME/Music'
 
-	elif [[ "$download_type" == 'q' ]]; then
+	elif [[ "$download_type" == "Quit?" ]]; then
 		# Verify if there are any jobs running in the background, wait for them to exit, and exit.
 		wait
+		break
 
 	fi
-	break
 
 done
