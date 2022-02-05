@@ -1,7 +1,9 @@
 #!/bin/bash
 # in this script i will be choosing which dowload-item to add/download/update.
-youtube_dl_bin="$HOME/download_music/yt-dl-fork/youtube-dl"
-youtube_dl_config="$HOME/download_music/yt-dl-fork/youtube-dl.config"
+repo_dir="$HOME/Documents/Bash/download_music"
+youtube_dl_bin="$repo_dir/yt-dl-fork/youtube-dl"
+youtube_dl_config="$repo_dir/yt-dl-fork/youtube-dl.config"
+intercept_name="$repo_dir/intercept_name.py"
 music_directory="$HOME/Music"
 download_types=( "Playlist" "Album" "Likes" "Quit?")
 playlist_dir="$music_directory/playlists"
@@ -14,11 +16,9 @@ set -x
 function write_script () {
 	cd "$music_directory/$1/$inner_dir_name"
 	cat > script.sh <<delimiter
-youtube_dl_bin="$HOME/download_music/yt-dl-fork/youtube-dl"
-youtube_dl_config="$HOME/download_music/yt-dl-fork/youtube-dl.config"
 
 # Run the 'youtube-dl' script.
-"\$youtube_dl_bin" --config-location "\$youtube_dl_config" "$link" &> "$logfile"
+"$youtube_dl_bin" --config-location "$youtube_dl_config" "$link" &> "$logfile"
 delimiter
 }
 
@@ -28,14 +28,7 @@ select download_type in "${download_types[@]}"; do
 	# Lets put inner directory name for playlists and album inside exportable paraneter `inner_dir_name`
 	if [[ "$download_type" = "${download_types[0]}" || "$download_type" = "${download_types[1]}" ]]; then
 		read -p "Give me a link> " link
-		export inner_dir_name="$(curl $link |& egrep -o '"><title>.+</title><lin')" # This will output a short sequence containing the playlist name. 
-		inner_dir_name="${inner_dir_name#'"><title>'}"
-		inner_dir_name="${inner_dir_name%'</title><lin'}" # Playlist should now be the playlist name
-		inner_dir_name="${inner_dir_name//&amp;/&}"
-		inner_dir_name="${inner_dir_name//&#39;/\'}"
-		inner_dir_name="${inner_dir_name//;/''}"
-		# I could add more substitution for special character codes in html i.e: ${inner_dir_name/&amp/'}
-		# Script to intercept the playlist link.
+		export inner_dir_name="$(curl $link | xargs --null python $intercept_name)" # This will output a short sequence containing the playlist name. 
 	fi
 
 	if [[ "$download_type" = "${download_types[0]}" ]]; then
