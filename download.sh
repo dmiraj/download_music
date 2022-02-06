@@ -5,7 +5,7 @@ youtube_dl_bin="$repo_dir/yt-dl-fork/youtube-dl"
 youtube_dl_config="$repo_dir/yt-dl-fork/youtube-dl.config"
 intercept_name="$repo_dir/intercept_name.py"
 music_directory="$HOME/Music"
-download_types=( "Playlist" "Album" "Likes" "Quit?")
+download_types=( "Playlist" "Album" "Likes" "Update" "Quit?")
 playlist_dir="$music_directory/playlists"
 album_dir="$music_directory/albums"
 likes_dir="$music_directory/My Likes"
@@ -60,6 +60,20 @@ select download_type in "${download_types[@]}"; do
 			cd "$likes_dir"
 			python "$youtube_dl_bin" --config-location "$youtube_dl_config" "$link" &> "$logfile" &
 		fi
+	elif [[ "$download_type" == "Update" ]]; then
+		# Update by executing the script in every downloaded object directory.
+		# This is applicable at the moment for only albums and playlists.
+
+		# For albums:
+		for album in "$album_dir"/*; do
+			bash "$album"/script.sh &
+		done
+
+		# For playlists:
+		for playlist in "$playlist_dir"/*; do
+			bash "$playlist"/script.sh &
+		done
+	fi
 
 	elif [[ "$download_type" == "Quit?" ]]; then
 		# Verify if there are any jobs running in the background, wait for them to exit, and exit.
