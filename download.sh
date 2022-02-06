@@ -60,6 +60,7 @@ select download_type in "${download_types[@]}"; do
 			cd "$likes_dir"
 			python "$youtube_dl_bin" --config-location "$youtube_dl_config" "$link" &> "$logfile" &
 		fi
+
 	elif [[ "$download_type" == "Update" ]]; then
 		# Update by executing the script in every downloaded object directory.
 		# This is applicable at the moment for only albums and playlists.
@@ -73,7 +74,6 @@ select download_type in "${download_types[@]}"; do
 		for playlist in "$playlist_dir"/*; do
 			bash "$playlist"/script.sh &
 		done
-	fi
 
 	elif [[ "$download_type" == "Quit?" ]]; then
 		# Verify if there are any jobs running in the background, wait for them to exit, and exit.
