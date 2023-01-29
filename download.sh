@@ -1,5 +1,5 @@
 #!/bin/bash
-# in this script i will be choosing which dowload-item to add/download/update.
+# In this script i will be choosing which dowload-item to add/download/update.
 repo_dir="$HOME/Documents/Bash/download_music"
 youtube_dl_bin="$repo_dir/yt-dl-fork/youtube-dl"
 youtube_dl_config="$repo_dir/yt-dl-fork/youtube-dl.config"
